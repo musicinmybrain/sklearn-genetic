@@ -114,7 +114,7 @@ def _createIndividual(icls, n, max_features, min_features):
 
 
 def _evalFunction(
-    individual, estimator, X, y, groups, cv, scorer, fit_params, max_features, min_features, caching, scores_cache={}
+    individual, estimator, X, y, groups, cv, scorer, params, max_features, min_features, caching, scores_cache={}
 ):
     individual_sum = np.sum(individual, axis=0)
     if individual_sum < min_features or individual_sum > max_features:
@@ -124,7 +124,7 @@ def _evalFunction(
         return scores_cache[individual_tuple][0], individual_sum, scores_cache[individual_tuple][1]
     X_selected = X[:, np.array(individual, dtype=bool)]
     scores = cross_val_score(
-        estimator=estimator, X=X_selected, y=y, groups=groups, scoring=scorer, cv=cv, fit_params=fit_params
+        estimator=estimator, X=X_selected, y=y, groups=groups, scoring=scorer, cv=cv, params=params
     )
     scores_mean = np.mean(scores)
     scores_std = np.std(scores)
@@ -170,7 +170,7 @@ class GeneticSelectionCV(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
         a scorer callable object / function with signature
         ``scorer(estimator, X, y)``.
 
-    fit_params : dict, optional
+    params : dict, optional
         Parameters to pass to the fit method.
 
     max_features : int or None, optional
@@ -253,7 +253,7 @@ class GeneticSelectionCV(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
         estimator,
         cv=None,
         scoring=None,
-        fit_params=None,
+        params=None,
         max_features=None,
         min_features=None,
         verbose=0,
@@ -271,7 +271,7 @@ class GeneticSelectionCV(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
         self.estimator = estimator
         self.cv = cv
         self.scoring = scoring
-        self.fit_params = fit_params
+        self.params = params
         self.max_features = max_features
         self.min_features = min_features
         self.verbose = verbose
@@ -377,7 +377,7 @@ class GeneticSelectionCV(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
             groups=groups,
             cv=cv,
             scorer=scorer,
-            fit_params=self.fit_params,
+            params=self.params,
             max_features=max_features,
             min_features=min_features,
             caching=self.caching,
